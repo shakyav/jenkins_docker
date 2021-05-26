@@ -19,5 +19,19 @@ services:
       context: centos8
     networks:
      - net
+
+  git:
+   container_name: git_server
+   image: 'gitlab/gitlab-ee:latest'
+   hostname: 'gitlab.example.com'
+   ports:
+     - '8090:80'
+   volumes:
+     - '$GITLAB_HOME/config:/etc/gitlab'
+     - '$GITLAB_HOME/logs:/var/log/gitlab'
+     - '$GITLAB_HOME/data:/var/opt/gitlab'
+   networks:
+    - net
+
 networks:
   net: 

@@ -30,6 +30,42 @@
 
 - refer this doc https://docs.docker.com/compose/install/
 
+# create docker container with jenkins and ansible 
+
+- create a directory jenkins-ansible inside jenkns-data and create a Dockerfile inside jenkins-ansible
+
+- Dockerfile for jenkins container with ansible installed, need root permissions to install ansible hence we used "USER root" inside docker file
+and then executed the apt-get update and install ansible command and switched back to USER jenkins
+
+       FROM jenkins/jenkins
+
+       USER root
+
+       RUN apt-get update && apt-get -y install ansible
+
+       USER jenkins
+
+- docker-compose file to spin up docker container with jenkins and ansible, volumes section specify that all the data that you have inside jenkins_home directory on your local machine will be reflected in the /var/jenkins_home directory inside the jenkins docker container
+
+       #docker compose file to spin a jenkins container only
+
+       version: '3'
+       services:
+         jenkins:
+            container_name: jenkins
+            image: jenkins-ansible
+            build:
+            context: jenkins-ansible
+            ports:
+            - "8080:8080"     #container port 8080 will be forwarded to the localhost port 8080, localhost_port:container_port
+            volumes:
+            - $PWD/jenkins_home:/var/jenkins_home
+            networks:
+            - net
+       networks:
+         net: 
+
+
 # create docker container with jenkins image 
 - create a directory jenkins-data where we will store all the jenkins related files
        
@@ -43,9 +79,7 @@
        services:
          jenkins:
             container_name: jenkins
-            image: jenkins-ansible
-            build:
-            context: jenkins-ansible
+            image: jenkins/jenkins
             ports:
             - "8080:8080"
             volumes:
