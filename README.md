@@ -1,4 +1,4 @@
-# jenkins_docker
+# Jenkins setup with docker
 
 # Install docker on fedora
 
@@ -30,7 +30,7 @@
 
 - refer this doc https://docs.docker.com/compose/install/
 
-# create a docker container for jenkins with docker running inside jenkins container
+# Create a docker container for jenkins with docker running inside jenkins container
 
 - create the Docker file to spin up jenkins container with docker installed and blue ocean plugin
 
@@ -111,7 +111,7 @@
 - to verify if the docker is runnnig inside the container , execute "docker exec -it <container_name> bash" to get inside the container shell and execute "docker run hello-world" . If the command is a success then docker daemon is running.
 
 
-# create docker container with jenkins and ansible 
+# Create docker container with jenkins and ansible 
 
 - create a directory jenkins-ansible inside jenkns-data and create a Dockerfile inside jenkins-ansible
 
@@ -147,7 +147,7 @@ and then executed the apt-get update and install ansible command and switched ba
          net: 
 
 
-# create docker container with jenkins image 
+# Create docker container with jenkins image 
 - create a directory jenkins-data where we will store all the jenkins related files
        
        mkdir jenkins-data
