@@ -2,4 +2,4 @@
 jenkins-data/centos8/remote-key.pub
 jenkins-data/centos8/remote-key
 jenkins-data/jenkins_home
-jenkins-data/jenkins-ansible
+jenkins-data/jenkins-ansible/remote-key

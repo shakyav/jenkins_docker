@@ -1,37 +1,68 @@
-version: '3'
-services:
+version: '3.8'
+networks:
+  jenkins-network:
+     name: jenkins
+volumes:
+  data:
+     name: jenkins-data
+  certs:
+     name: jenkins-docker-certs
+services:  
+  dind:
+     container_name: jenkins-docker
+     image: docker:dind
+     privileged: true
+     restart: unless-stopped
+     networks:
+       jenkins-network:
+         aliases:
+           - docker
+     ports:
+       - 3000:3000
+     volumes:
+       - data:/var/jenkins_home
+       - certs:/certs/client
+     environment:
+       - DOCKER_TLS_CERTDIR=/certs
+    
   jenkins:
-    container_name: jenkins
-    image: jenkins-ansible
-    build:
-      context: jenkins-ansible
-    ports:
-     - "8080:8080"
-    volumes:
-     - $PWD/jenkins_home:/var/jenkins_home
-    networks:
-     - net
-
+     container_name: jenkins
+     image: jenkins-ansible
+     build:
+       context: jenkins-ansible
+     restart: unless-stopped
+     networks:
+       - jenkins-network
+     ports:
+       - '8080:8080'
+       - '50000:50000'
+       - '3000:3000'
+     volumes:
+       - data:/var/jenkins_home
+       - certs:/certs/client:ro
+     environment:
+       - DOCKER_HOST=tcp://docker:2376
+       - DOCKER_CERT_PATH=/certs/client
+       - DOCKER_TLS_VERIFY=1
   remote_host:
-    container_name: remote-host
-    image: remote-host
-    build:
-      context: centos8
-    networks:
-     - net
+     container_name: remote-host
+     image: remote-host
+     build:
+       context: centos8
+     networks:
+       - jenkins-network
 
   git:
-   container_name: git_server
-   image: 'gitlab/gitlab-ee:latest'
-   hostname: 'gitlab.example.com'
-   ports:
-     - '8090:80'
-   volumes:
-     - '$GITLAB_HOME/config:/etc/gitlab'
-     - '$GITLAB_HOME/logs:/var/log/gitlab'
-     - '$GITLAB_HOME/data:/var/opt/gitlab'
-   networks:
-    - net
+     container_name: git_server
+     image: 'gitlab/gitlab-ee:latest'
+     hostname: 'gitlab.example.com'
+     ports:
+       - '8090:80'
+     volumes:
+       - '$GITLAB_HOME/config:/etc/gitlab'
+       - '$GITLAB_HOME/logs:/var/log/gitlab'
+       - '$GITLAB_HOME/data:/var/opt/gitlab'
+     networks:
+       - jenkins-network
 
-networks:
-  net: 
+

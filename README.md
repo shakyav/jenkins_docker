@@ -30,6 +30,87 @@
 
 - refer this doc https://docs.docker.com/compose/install/
 
+# create a docker container for jenkins with docker running inside jenkins container
+
+- create the Docker file to spin up jenkins container with docker installed and blue ocean plugin
+
+       FROM jenkins/jenkins:lts-jdk11
+
+       USER root
+
+
+       RUN apt-get update && apt-get install -y apt-transport-https \
+              ca-certificates curl gnupg2 \
+              software-properties-common
+       RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+       RUN apt-key fingerprint 0EBFCD88
+       RUN add-apt-repository \
+              "deb [arch=amd64] https://download.docker.com/linux/debian \
+              $(lsb_release -cs) stable"
+       RUN apt-get update && apt-get install -y docker-ce-cli
+
+       RUN groupadd docker
+
+       RUN usermod -aG docker jenkins
+
+       USER jenkins
+
+       RUN jenkins-plugin-cli --plugins "blueocean:1.24.6 docker-workflow:1.26"
+
+- docker-compose.yml file to build the dockerized jenkins contianer with docker and blueocean plugin
+
+       version: '3.8'
+       networks:
+              jenkins-network:
+                  name: jenkins
+       volumes:
+              data:
+                  name: jenkins-data
+              certs:
+                  name: jenkins-docker-certs
+       services:  
+              dind:
+                  container_name: jenkins-docker
+                  image: docker:dind
+                  privileged: true
+                  restart: unless-stopped
+                  networks:
+                     jenkins-network:
+                            aliases:
+                                - docker
+                  ports:
+                     - 3000:3000
+                  volumes:
+                     - data:/var/jenkins_home
+                     - certs:/certs/client
+                  environment:
+                     - DOCKER_TLS_CERTDIR=/certs
+    
+              jenkins:
+                  container_name: jenkins
+                  image: jenkins-ansible
+                  build:
+                     context: jenkins-ansible
+                  restart: unless-stopped
+                  networks:
+                     - jenkins-network
+                  ports:
+                     - '8080:8080'
+                     - '50000:50000'
+                     - '3000:3000'
+                  volumes:
+                     - data:/var/jenkins_home
+                     - certs:/certs/client:ro
+                  environment:
+                     - DOCKER_HOST=tcp://docker:2376
+                     - DOCKER_CERT_PATH=/certs/client
+                     - DOCKER_TLS_VERIFY=1
+
+- run the "docker-compose build" commmand to build the images and then "docker-compose up -d" to bring up the containers
+- execute "docker ps" to get the list of srunning containers
+- to verify if the docker is runnnig inside the container , execute "docker exec -it <container_name> bash" to get inside the container shell and execute "docker run hello-world" . If the command is a success then docker daemon is running.
+
+
 # create docker container with jenkins and ansible 
 
 - create a directory jenkins-ansible inside jenkns-data and create a Dockerfile inside jenkins-ansible
