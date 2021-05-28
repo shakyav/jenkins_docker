@@ -90,7 +90,7 @@
                   container_name: jenkins
                   image: jenkins-ansible
                   build:
-                     context: jenkins-ansible
+                     context: jenkins-ansible          #this is the path to the directory where I have my Dockerfile stored
                   restart: unless-stopped
                   networks:
                      - jenkins-network
