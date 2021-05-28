@@ -32,7 +32,7 @@
 
 # Create a docker container for jenkins with docker running inside jenkins container
 
-- create the Docker file to spin up jenkins container with docker installed and blue ocean plugin
+- create the Docker file to build jenkins container with docker installed and blue ocean plugin
 
        FROM jenkins/jenkins:lts-jdk11
 
@@ -110,6 +110,36 @@
 - execute "docker ps" to get the list of srunning containers
 - to verify if the docker is runnnig inside the container , execute "docker exec -it <container_name> bash" to get inside the container shell and execute "docker run hello-world" . If the command is a success then docker daemon is running.
 
+
+# Create CI/CD pipeline for simple NodeJs application
+
+- create a pipeline project , dashboard -> newitem -> <your_peipeline_name> -> select pipeline from the list -> click OK
+
+  ![pipeline_create](screens/pipeline_create.png)
+  
+
+- configure the pipeline as shown below, provide the url of the repository for which you want to automate , also mkae sure you have the Jenkinsfile present in the repository to finish the build with success, otherwise create a new Jenkinsfile and commit to the repository
+
+  ![pipeline_config](screens/pipeline_config.png)
+
+- save the pipeline config and click build now to trigger the pipeline, can also set build triggers using github webhooks and SCM polling which will trigger the pipeline if there's any change detected in the repository . I forked this repo for testing purpose, [simple-node-js-react-npm-app](https://github.com/jenkins-docs/simple-node-js-react-npm-app)
+
+- refer this repo for Jenkinsfile used for simple nodejs and react app , [https://github.com/shakyav/simple-node-js-react-npm-app](https://github.com/shakyav/simple-node-js-react-npm-app) 
+
+- Once the pipeline is triggered you can view the output as hown below
+
+  ![pipeline_build](screens/pipeline_build.png)
+
+- You can also view the console output as shown below   
+
+  ![pipeline_console_output](screens/pipeline_console_output.png)
+
+- Or you can aslo view the pipeline with blueocean plugin as well if installed
+
+  ![blueocean_pipeline](screens/blueocean.png)
+
+
+  
 
 # Create docker container with jenkins and ansible 
 
